@@ -1,0 +1,4 @@
+$ echo "1234 2000" | java Atm cardreader.txt
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   Dispensed Rs 2000. Balance left: Rs 3000.0
+  [finally] card ejected, session logged (path=SUCCESS)

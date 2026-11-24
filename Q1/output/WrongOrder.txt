@@ -1,0 +1,5 @@
+$ javac wrongorder/WrongOrder.java
+wrongorder/WrongOrder.java:12: error: exception FileNotFoundException has already been caught
+        } catch (FileNotFoundException e) {          // ... makes this unreachable -> compile error
+          ^
+1 error

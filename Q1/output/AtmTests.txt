@@ -1,0 +1,58 @@
+Test                               path taken (finally always ran)
+T1 valid withdrawal   input: "1234 1500"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   Dispensed Rs 1500. Balance left: Rs 3500.0
+  [finally] card ejected, session logged (path=SUCCESS)
+T2 letters instead of amount   input: "1234 abc"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   [multi-catch InputMismatchException] Invalid input: null
+  [finally] card ejected, session logged (path=InputMismatchException)
+T3 negative amount   input: "1234 -500"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   [multi-catch IllegalArgumentException] Invalid input: Amount must be positive: -500
+  [finally] card ejected, session logged (path=IllegalArgumentException)
+T4 more than balance   input: "1234 900000"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   [catch InsufficientFundsException] Balance 3500.0 < requested 900000
+  [finally] card ejected, session logged (path=InsufficientFunds)
+T5 card-reader file missing   input: "1234 100"
+  --- session start (card file: missing.txt) ---
+  [catch FileNotFoundException] Card reader unavailable: missing.txt (No such file or directory)
+  [finally] card ejected, session logged (path=FileNotFound)
+T6 card file empty   input: "1234 100"
+  --- session start (card file: emptycard.txt) ---
+  [catch IOException] Card read error: Card-reader file is empty
+  [finally] card ejected, session logged (path=IOException)
+T7 input ends early   input: "1234"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   Enter amount:   [catch NoSuchElementException] Input ended early
+  [finally] card ejected, session logged (path=NoInput)
+T8 account not matching card   input: "9876 100"
+  --- session start (card file: cardreader.txt) ---
+  Enter account number:   [multi-catch IllegalArgumentException] Invalid input: Account does not match card
+  [finally] card ejected, session logged (path=IllegalArgumentException)
+
+Summary
+T1 valid withdrawal                SUCCESS                      finally=yes
+T2 letters instead of amount       InputMismatchException       finally=yes
+T3 negative amount                 IllegalArgumentException     finally=yes
+T4 more than balance               InsufficientFunds            finally=yes
+T5 card-reader file missing        FileNotFound                 finally=yes
+T6 card file empty                 IOException                  finally=yes
+T7 input ends early                NoInput                      finally=yes
+T8 account not matching card       IllegalArgumentException     finally=yes
+
+Uncaught exception (no handler) - stack trace:
+java.lang.NumberFormatException: For input string: "12O0"
+	at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
+	at java.base/java.lang.Integer.parseInt(Integer.java:662)
+	at java.base/java.lang.Integer.parseInt(Integer.java:778)
+	at AtmTests.parseAmount(AtmTests.java:43)
+	at AtmTests.uncaughtDemo(AtmTests.java:42)
+	at AtmTests.main(AtmTests.java:33)
+
+Cost: 1,000,000 failing withdrawals ("-500"), median of 5 runs
+  error code                 :     7.1 ns per failure
+  throw + catch (full trace) :   469.2 ns per failure
+  throw + catch (no trace)   :     8.7 ns per failure
+  frames captured in one exception here: 2
