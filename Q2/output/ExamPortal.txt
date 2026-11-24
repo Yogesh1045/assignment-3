@@ -1,0 +1,41 @@
+Scenario table (one per exception):
+  S1 valid submission
+    student sees: Submitted successfully.
+  S2 window closed
+    student sees: Submission rejected: the exam window has closed.
+  S3 not registered
+    student sees: Submission rejected: you are not registered for this course.
+  S4 file too large
+    student sees: Submission rejected: your file is 900 KB (maximum 500 KB). Please compress it.
+  S5 disk full (IOException)
+    [server log] ExamPortal$PortalStorageException: Could not store ans.pdf for 192311001
+    [server log]   caused by: java.io.IOException: No space left on device (/exam-store, 0 bytes free)
+    student sees: We could not save your answers right now. Please try again in a few minutes.
+  S6 configuration bug (unchecked)
+    not caught by the controller (unchecked, a bug): ExamPortal$PortalConfigurationException: Registration table not loaded
+
+Chained stack trace (S5, cause kept):
+ExamPortal$PortalStorageException: Could not store ans.pdf for 192311001
+	at ExamPortal$StorageLayer.store(ExamPortal.java:54)
+	at ExamPortal$SubmissionService.submit(ExamPortal.java:78)
+	at ExamPortal.main(ExamPortal.java:140)
+Caused by: java.io.IOException: No space left on device (/exam-store, 0 bytes free)
+	at ExamPortal$StorageLayer.writeToDisk(ExamPortal.java:59)
+	at ExamPortal$StorageLayer.store(ExamPortal.java:52)
+	... 2 more
+getCause() -> java.io.IOException: No space left on device (/exam-store, 0 bytes free)
+
+Same failure re-thrown WITHOUT the cause:
+ExamPortal$PortalStorageException: Could not store ans.pdf for 192311001
+	at ExamPortal$StorageLayer.store(ExamPortal.java:55)
+	at ExamPortal$SubmissionService.submit(ExamPortal.java:78)
+	at ExamPortal.main(ExamPortal.java:148)
+getCause() -> null   <- the real reason (disk full) is gone
+
+Cost of creating one exception at call depth d (median of 5 x 200,000, ns):
+ depth d   with stack trace without (writable=false)    frames held
+       1               2184                     26              5
+      10               4055                     34             14
+      50              13160                    159             54
+     200              46338                   1038            204
+A 3-level chain keeps all 3 exception objects and 6 stack frames reachable from the top one.
