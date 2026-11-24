@@ -1,0 +1,53 @@
+(a) extends Thread:
+    before start: Station-1 state=NEW isAlive=false
+    after start : Station-1 state=TIMED_WAITING isAlive=true
+    after join  : Station-1 state=TERMINATED isAlive=false
+    total scanned = 100 (expected 100)
+
+(b) implements Runnable:
+    total scanned = 100
+
+(c) Finish order over 10 runs (same program, same input):
+    run  1: [S4, S3, S1, S2]
+    run  2: [S1, S2, S3, S4]
+    run  3: [S2, S1, S3, S4]
+    run  4: [S3, S1, S2, S4]
+    run  5: [S2, S4, S3, S1]
+    run  6: [S1, S3, S4, S2]
+    run  7: [S1, S4, S2, S3]
+    run  8: [S3, S4, S2, S1]
+    run  9: [S3, S4, S2, S1]
+    run 10: [S2, S1, S3, S4]
+    distinct orders seen: 8
+
+(d) Priorities: S1=MIN(1) ... S4=MAX(10), CPU-bound work, 10 runs - position of S4 when it finished:
+    S4 (MAX priority) finished in position: [2, 3, 4, 3, 2, 3, 4, 4, 4, 4]   (1 = first)
+    available processors: 2
+
+(f) run() vs start():
+    inside run(): executing on thread 'main'
+    inside run(): executing on thread 'Station-X'
+
+(g) Life-cycle states observed for one station:
+    NEW  (created, not started)
+    WAITING  (in lock.wait())
+    TIMED_WAITING  (in Thread.sleep)
+    BLOCKED  (wants the lock main is holding)
+    TERMINATED  (run() returned)
+
+(h) n scripts, 2 ms each: one Thread per station vs fixed pool ExecutorService (median of 3)
+     scripts    p  4 Thread objects ms     pool(p) tasks ms   ideal n*2/p ms
+         100    1                   53                  216              200
+         100    2                   53                  107              100
+         100    4                   53                   53               50
+         100    8                   53                   27               25
+         400    1                  211                  855              800
+         400    2                  212                  425              400
+         400    4                  212                  212              200
+         400    8                  212                  108              100
+
+(e) Daemon station (needs 400 ms, main ends after ~60 ms):
+    daemon Station-4 scanned 1
+    daemon Station-4 scanned 2
+    main() ends now - JVM exits because only daemon threads remain
+    daemon Station-4 scanned 3
