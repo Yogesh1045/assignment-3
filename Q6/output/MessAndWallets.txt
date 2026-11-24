@@ -1,0 +1,32 @@
+=== Part A: wallet transfers ===
+Unsafe A->B with B->A: after 1 s both alive=true, JVM deadlock detector found 2 deadlocked threads
+   T1 (A->B) is BLOCKED waiting for MessAndWallets$Wallet@2d98a335, which is held by T2 (B->A)
+   T2 (B->A) is BLOCKED waiting for MessAndWallets$Wallet@b4c966a, which is held by T1 (A->B)
+Unsafe version: deadlocked in 10/10 trials
+Lock ordering: 8 threads x 50 opposite-direction transfers finished=true in 452 ms, total money=2000 (expected 2000)
+tryLock+timeout: finished=true in 5 ms, total money=2000, attempts per transfer=1.00
+
+=== Part B: mess token counter (capacity 5) ===
+while + notifyAll, 1 cook, 2 students, 20 tokens : sum=210 (correct)  size range seen [0, 5]
+   size after each put/take (first 60): [1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 4, 5, 4, 5, 4, 5, 4, 3, 2, 1, 0, 1, 2, 1, 0]
+if    + notifyAll, 1 cook, 2 students (given setup), run 1 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 2 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 3 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 4 : sum=187 (WRONG, expected 210)  size range seen [-2, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 5 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 6 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 7 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 8 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 9 : sum=55 (WRONG, expected 210)  size range seen [-10, 5]
+if    + notifyAll, 1 cook, 2 students (given setup), run 10 : sum=210 (correct)  size range seen [0, 5]
+if    + notifyAll, 2 cooks, 3 students, run 1    : sum=101470 (WRONG, expected 180300)  size range seen [-214, 5]
+if    + notifyAll, 2 cooks, 3 students, run 2    : sum=20500 (WRONG, expected 180300)  size range seen [-300, 5]
+if    + notifyAll, 2 cooks, 3 students, run 3    : sum=7125 (WRONG, expected 180300)  size range seen [-488, 5]
+if    + notifyAll, 2 cooks, 3 students, run 4    : sum=68225 (WRONG, expected 180300)  size range seen [-389, 5]
+if    + notifyAll, 2 cooks, 3 students, run 5    : sum=67911 (WRONG, expected 180300)  size range seen [-409, 5]
+while + notify (not All), 3 cooks, 3 students, capacity 1: hung in 10/10 runs
+while + notifyAll,         3 cooks, 3 students, capacity 1: hung in 0/10 runs
+
+put/take cost, 200,000 tokens, 1 producer + 2 consumers, capacity 5 (median of 5):
+   wait/notifyAll counter : 5715 ns per token
+   ArrayBlockingQueue(5)  : 8740 ns per token
