@@ -1,0 +1,73 @@
+1) Good input, 5 stores: both versions must give the same report
+   manual total=13875  try-with-resources total=13875  identical report files: true
+      work/good/store1.csv,1775
+      work/good/store2.csv,2275
+      work/good/store3.csv,2775
+      work/good/store4.csv,3275
+      work/good/store5.csv,3775
+      TOTAL,13875
+
+2) Failing input: 200 stores, store #3 corrupt; the report job is retried 50 times (like a scheduler would)
+   manual first failure: java.lang.NumberFormatException: For input string: "12O"
+   manual              runs failed=50  tracked files still open=50  extra OS file descriptors=26
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+   try-with-resources first failure: java.io.IOException: Corrupt store file work/bad/store3.csv at line 51
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+    [LOG SEVERE] Bad data in work/bad/store3.csv line 51: "item51,12O"
+   try-with-resources  runs failed=50  tracked files still open=0  extra OS file descriptors=-26
+
+3) Suppressed exception: body throws AND close() throws
+   open  reader-A
+   open  reader-B
+   close reader-B
+   close reader-A
+   primary   : body failed while reading
+   suppressed: close of reader-B failed
+   suppressed: close of reader-A failed
