@@ -1,0 +1,36 @@
+Hand-checked set (10 files):
+   S01  PASS           
+   S02  PASS           
+   S03  FAIL           
+   S04  FAIL           
+   S05  MISSING_FILE   data/small/S05.txt
+   S06  CORRUPT_FILE   non-numeric mark: For input string: "7O"
+   S07  CORRUPT_FILE   expected 5 marks, found 3
+   S08  CORRUPT_FILE   header/regNo mismatch
+   S09  INVALID_MARKS  mark out of range: 101
+   S10  PASS           
+   summary: {PASS=3, FAIL=2, MISSING_FILE=1, CORRUPT_FILE=3, INVALID_MARKS=1, TIMEOUT=0, UNEXPECTED=0}
+   expected by hand: PASS 3, FAIL 2, MISSING 1, CORRUPT 3, INVALID 1 -> MATCH
+
+Injected into 10,000 files: missing=103 corrupt=111 invalid-mark=47
+  pool    time (ms)   speed-up    total missing/corr/inv  complete?
+A) with 400 us simulated network-share latency per file (I/O-bound):
+     1         5340       1.0x    10000     103/111/47        yes
+     2         2615       2.0x    10000     103/111/47        yes
+     4         1291       4.1x    10000     103/111/47        yes
+     8          641       8.3x    10000     103/111/47        yes
+    16          335      15.9x    10000     103/111/47        yes
+    32          177      30.2x    10000     103/111/47        yes
+B) local disk, no simulated latency (CPU-bound, 2 cores):
+     1          172       1.0x    10000     103/111/47        yes
+     2           83       2.1x    10000     103/111/47        yes
+     4           60       2.8x    10000     103/111/47        yes
+     8           62       2.8x    10000     103/111/47        yes
+    16           54       3.2x    10000     103/111/47        yes
+    32           71       2.4x    10000     103/111/47        yes
+
+Alternatives on the same 10,000 files:
+   parallelStream (common pool, 1 workers):   2640 ms, peak JVM threads 7, outcomes 10000
+   one thread per file (10,000 threads)  :   1495 ms, peak JVM threads 27, outcomes 10000
+   ExecutorService fixed pool of 16      :    345 ms, peak JVM threads 23, outcomes 10000
+   failure handling: an exception thrown inside parallelStream().forEach aborts the whole stream (observed); ExecutorService confines it to that file's Future.
