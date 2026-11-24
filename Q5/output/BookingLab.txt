@@ -1,0 +1,15 @@
+A) Reliable reproduction: 10 seats, 100 threads released together by a latch, 20 trials
+   unsafe seats sold per trial: 100 46 63 46 45 35 72 72 80 28 57 60 57 64 92 72 67 63 60 59
+   trials with double booking: 20/20, worst = 100 seats sold for 10 seats
+   SyncMethod: trials with a wrong count = 0/20
+   SyncBlock: trials with a wrong count = 0/20
+
+B) Time for 10,000 bookings (8 threads x 1,250) on 500 seats; median of 7 runs
+   strategy                      time (ms)     ns/booking       sold
+   unsynchronized (WRONG)            82.69         8268.6        580
+   synchronized method                1.48          148.5        500
+   synchronized block                 1.27          127.3        500
+   AtomicBoolean[] CAS                1.15          115.1        500
+   ReentrantLock                      1.96          195.7        500
+   ConcurrentHashMap.putIfAbsent         2.57          256.9        500
+   (500 seats: every seat is wanted 20 times, so exactly 500 must be sold)
