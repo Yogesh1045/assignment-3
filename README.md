@@ -3,7 +3,7 @@
 
 | | |
 |---|---|
-| **Student A (name / register number)** | Yogesh / _(add your register number)_ |
+| **Student A (name / register number)** | Yogesh / 192371045 |
 | **Student B (name / register number)** | _(partner's name / register number)_ |
 | **Course** | CSA09 – Programming in Java |
 | **Java version** | OpenJDK 21 (Java 17 or newer needed) |
